@@ -1,15 +1,10 @@
-# Mixin.js
+# Mixin-Pro, for javascript multi-inheritance
 
 Mixin is an easy way to repeatedly mix functionality into a prototypical
 JavaScript class. It automatically takes care of the combination of overriding
 prototype methods and invoking constructors. Moreover, it will notify a mixed
 in constructor that is has been mixed into another class. This can be used to
 construct dependent mixin hierarchies.
-
-Mixin-pro support multiplel mixin in one call:
-```javascript
-Foo = mixin(Foo, [bar1, bar2, ...]);
-```
 
 ## Installation
 
@@ -20,33 +15,34 @@ Using npm:
 
 ## Usage:
 ```javascript
-    var mixin = require("mixin-pro");
-
-    function Foo() {
-    }
-
+    // base class Foo, Foo1, Foo2
+    function Foo() {}
     Foo.prototype = {
        t1: function() { return 't1'; }
     };
 
+    // use case 1: basic mixin
+    var mixin = require("mixin-pro");
     Foo = mixin(Foo, EventEmitter);
-```
-this is the equivalent of:
-```javascript
-    function Foo() {
-        EventEmitter.call(this);
-    }
 
-    Foo.prototype = Object.create(EventEmitter.prototype);
+    // use case 2: multi inheritance
+    var inherit = require("mixin-pro").inherit;
+    var Bar = inherit([Foo, Foo2, Foo3, ...], {
+      constructor: function Bar() {},
+      t2: function() {},
+    });
 ```
-except that I can define a full set of prototypes in the `Foo.prototype`
-statement before I invoke the mixin.
 
 # Usage
 
-## mixin(base, mixed)
+## inherit([foo1, foo2, ...], { your_new_code_here } )
 
-`mixed` can be one function simulated class, or an array of multiple ones.
+`constructor` is required, and the function must be named as your new class name.
+
+When a new class object constructed, the constructors of the inherited base classes 
+will be called in order.
+
+## mixin(base, mixed)
 
 The call `mixin(base, mixed)` returns a new constructor that adds the
 prototype for `mixed` at the back of the prototype chain for `base` and

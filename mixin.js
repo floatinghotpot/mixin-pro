@@ -1,21 +1,35 @@
 /*
-  mixin.js - Mixin in constructors in JavaScript.
+  mixin-pro.js - multi-inherit with mixin in constructors in JavaScript.
 
-  Copyright 2011, Lee Iverson <leei@sociologi.ca>.
-  See LICENSE for terms.
-  */
+  Copyright 2016, Raymond Xie <rjfun.mobile@gmail.com>.
+
+  Thanks for mixin code by Lee Iverson <leei@sociologi.ca>.
+
+ */
 
 var util = require('util');
 
 /**
  * Accept multiple mixins in one function call, like this:
- * Foo = mixin(Foo, [bar1, bar2, ...])
+ * Foo = inherit(mixed, {
+   constructor: function Foo() {},
+   method: function(){},
+ });
  *
  * By Raymond Xie <rjfun.mobile@gmail.com>, 2016/1/26
  */
-function mixins(base, mixins) {
+function inherit(mixins, mapping) {
+  var base;
+  if(typeof mapping['constructor'] === 'function') {
+    base = mapping['constructor'];
+    delete mapping['constructor'];
+  } else {
+    base = function(){};
+  }
+  base.prototype = mapping;
+
   if(Array.isArray(mixins)) {
-    for(var i=0; i<mixins.length; i++) {
+    for(var i=mixins.length-1; i>=0; i--) {
       base = mixin(base, mixins[i]);
     }
     return base;
@@ -152,4 +166,6 @@ function alias(obj, method, suffix, f) {
 
 mixin.alias = alias;
 
-module.exports = mixins;
+mixin.inherit = inherit;
+
+module.exports = mixin;

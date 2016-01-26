@@ -1,8 +1,8 @@
 {
   "name": "mixin-pro",
-  "description": "Improved javascript mixin to realize multiple inheritance for code reuse",
-  "version": "0.3.0",
-  "author": "Lee Iverson <leei@sociologi.ca>",
+  "description": "Javascript multi-inheritance with mixin for code reuse",
+  "version": "0.4.0",
+  "author": "Raymond Xie <rjfun.mobile@gmail.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/floatinghotpot/mixin-pro.git"
@@ -12,18 +12,11 @@
   },
   "keywords": [
     "mixin",
-    "mixin-pro",
+    "inherit",
+    "multi-inherit",
+    "extend",
+    "multiple",
     "rjfun"
-  ],
-  "contributors": [
-    {
-      "name": "Lee Iverso",
-      "email": "leei@sociologi.ca"
-    },
-    {
-      "name": "Raymond Xie",
-      "email": "rjfun.mobile@gmail.com"
-    }
   ],
   "license": "MIT",
   "engines": { "node": ">= 0.4.0" },
