@@ -50,22 +50,24 @@ var E = Class([A, B, D], {
   fe: function() {
     this.fa();
     this.fb();
-    //this.fc();
+    this.fc();
     this.fd();
     console.log('E->fe()');
   },
 });
 
-console.log(A.prototype);
-console.log(B.prototype);
-console.log(C.prototype);
-console.log(D.prototype);
-console.log(E.prototype);
+//console.log(A.prototype);
+//console.log(B.prototype);
+//console.log(C.prototype);
+//console.log(D.prototype);
+//console.log(E.prototype);
 
 var e = new E();
 
 console.log(e);
+
 console.log(e.constructor.name);
+
 console.log('e.instanceOf(A) -> ' + e.instanceOf(A));
 console.log('e.instanceOf(B) -> ' + e.instanceOf(B));
 console.log('e.instanceOf(C) -> ' + e.instanceOf(C));

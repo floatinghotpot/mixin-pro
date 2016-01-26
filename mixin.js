@@ -24,35 +24,36 @@ var util = require('util');
  * By Raymond Xie <rjfun.mobile@gmail.com>, 2016/1/26
  */
 function createClass() {
-  var mixins, mapping;
+  var mixins, definition;
   switch(arguments.length) {
     case 0:
       throw "class definition required";
       break;
     case 1:
-      mapping = arguments[0];
+      definition = arguments[0];
       mixins = [];
       break;
     default:
       mixins = arguments[0];
-      mapping = arguments[1];
+      definition = arguments[1];
       break;
   }
 
   var base;
-  if(typeof mapping['constructor'] === 'function') {
-    base = mapping['constructor'];
-    delete mapping['constructor'];
+  if(typeof definition['constructor'] === 'function') {
+    base = definition['constructor'];
+    delete definition['constructor'];
   } else {
     base = function(){};
   }
 
-  base.prototype = mapping;
+  base.prototype = definition;
   base.prototype.constructor = base;
   base.prototype.instanceOf = function(baseclass) {
     if(this instanceof baseclass) return true;
     return subOf(this.constructor, baseclass);
   };;
+  if(!mixins) return base;
 
   if(Array.isArray(mixins)) {
     for(var i=mixins.length-1; i>=0; i--) {
@@ -64,14 +65,14 @@ function createClass() {
   }
 }
 
-function subOf(sub, base) {
-  if(!sub) return false;
-  if(base === sub) return true;
-
-  if(!sub.constructors) return false;
-  for(var i in sub.constructors) {
-    if(subOf(sub.constructors[i], base)) return true;
+function subOf(sub, mixin) {
+  if(sub === mixin) return true;
+  if(sub && sub.constructors) {
+    for(var i in sub.constructors) {
+      if((sub.constructors[i] !== sub) && subOf(sub.constructors[i], mixin)) return true;
+    }
   }
+  return false;
 }
 
 /**
@@ -95,6 +96,7 @@ function subOf(sub, base) {
 function mixin(base, mixin) {
   var ctor = base;
   if (base.constructors) {
+    //if(subOf(base, mixin)) return base;
     // Don't mixin the same constructor twice.
     for (var i in base.constructors) {
       if (base.constructors[i] === mixin)
@@ -132,18 +134,32 @@ function mixin_constructor(name, ctor) {
   return eval(name);
 }
 
+function isEmpty(ob) {
+  for(var i in ob) return false;
+  return true;
+}
+
 function insert_proto(base, mixin) {
-  //inspect_protos(base,  "inserting: base ");
-  //inspect_protos(mixin, "inserting: mixin");
+  //console.log('\n' + base.name + ' <- ' + mixin.name);
+  //inspect_protos(base,  "\ninserting: base ");
+  //inspect_protos(mixin, "\ninserting: mixin");
   var copy = copyInto({}, mixin);
   copy.__mixed_in = true;
+
   // Find
   for (var p = base, prev = base; p.__mixed_in; prev = p, p = p.__proto__) {}
-  if (p == base) { p.__mixed_in = true; } // Mark this as mixed in
-  //inspect_protos(copy, "inserting: copy");
+  if (p === base) { p.__mixed_in = true; } // Mark this as mixed in
+  // inspect_protos(copy, "\ninserting: copy");
   copy.__proto__ = prev.__proto__;
   prev.__proto__ = copy;
-  //inspect_protos(base, "inserted: base");
+  //inspect_protos(base, "\ninserted: base");
+
+  // insert further, if mixin itself has been mixed in
+  for(var q = mixin.__proto__; q; q = q.__proto__) {
+    if(q && !isEmpty(q))
+      insert_proto(base, q);
+  }
+
   return base;
 }
 
