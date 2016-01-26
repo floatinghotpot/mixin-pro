@@ -10,15 +10,35 @@
 var util = require('util');
 
 /**
- * Accept multiple mixins in one function call, like this:
- * Foo = inherit(mixed, {
-   constructor: function Foo() {},
-   method: function(){},
- });
- *
+ * Create a function simulated class, allow multiple inheritance
+
+  var mapping = {
+    constructor: function Foo() {},
+    method: function(){},
+  });
+
+  Foo = createClass(mapping);
+  Foo = createClass(base, mapping);
+  Foo = createClass([base1, base2, ...], mapping);
+
  * By Raymond Xie <rjfun.mobile@gmail.com>, 2016/1/26
  */
-function inherit(mixins, mapping) {
+function createClass() {
+  var mixins, mapping;
+  switch(arguments.length) {
+    case 0:
+      throw "class definition required";
+      break;
+    case 1:
+      mapping = arguments[0];
+      mixins = [];
+      break;
+    default:
+      mixins = arguments[0];
+      mapping = arguments[1];
+      break;
+  }
+
   var base;
   if(typeof mapping['constructor'] === 'function') {
     base = mapping['constructor'];
@@ -26,7 +46,13 @@ function inherit(mixins, mapping) {
   } else {
     base = function(){};
   }
+
   base.prototype = mapping;
+  base.prototype.constructor = base;
+  base.prototype.instanceOf = function(baseclass) {
+    if(this instanceof baseclass) return true;
+    return subOf(this.constructor, baseclass);
+  };;
 
   if(Array.isArray(mixins)) {
     for(var i=mixins.length-1; i>=0; i--) {
@@ -35,6 +61,16 @@ function inherit(mixins, mapping) {
     return base;
   } else {
     return mixin(base, mixins);
+  }
+}
+
+function subOf(sub, base) {
+  if(!sub) return false;
+  if(base === sub) return true;
+
+  if(!sub.constructors) return false;
+  for(var i in sub.constructors) {
+    if(subOf(sub.constructors[i], base)) return true;
   }
 }
 
@@ -166,6 +202,7 @@ function alias(obj, method, suffix, f) {
 
 mixin.alias = alias;
 
-mixin.inherit = inherit;
+mixin.createClass = createClass;
+mixin.inherit = createClass;
 
 module.exports = mixin;

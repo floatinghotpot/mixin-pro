@@ -15,29 +15,62 @@ Using npm:
 
 ## Usage:
 ```javascript
-    // base class Foo, Foo1, Foo2
+    var mixin = require("mixin-pro");
+
+    // traditional: create base class Foo, Foo1, Foo2, ...
     function Foo() {}
     Foo.prototype = {
-       t1: function() { return 't1'; }
+       t0: function() { return 't0'; }
     };
 
-    // use case 1: basic mixin
-    var mixin = require("mixin-pro");
-    Foo = mixin(Foo, EventEmitter);
+    // normal mixin: add features to existing classes
+    Foo1 = mixin(Foo1, Foo2);
 
-    // use case 2: multi inheritance
-    var inherit = require("mixin-pro").inherit;
-    var Bar = inherit([Foo, Foo2, Foo3, ...], {
-      constructor: function Bar() {},
-      t2: function() {},
+    var Class = require("mixin-pro").createClass;
+
+    // use case 1: create a base class
+    var Bar1 = Class({
+      constructor: function Bar1() {},
+      t1: function() { return 't1'; },
     });
+
+    // use case 2: create a class and inherit from a base class
+    var Bar2 = Class(Foo1, {
+      constructor: function Bar2() {},
+      t2: function() { return 't2'; },
+    });
+
+    // use case 3: create a class and inherit from multi base classes
+    var Bar3 = Class([Foo, Foo2, ...], {
+      constructor: function Bar3() {},
+      t3: function() { return 't3'; },
+    });
+
+    // check an object is instance of the inherited base class
+    var bar3 = new Bar3();
+    if(bar3.instanceOf(Bar3)) {} // true
+    if(bar3.instanceOf(Foo)) {} // true
+    if(bar3.instanceOf(Foo2)) {} // true
+
 ```
 
 # Usage
 
-## inherit([foo1, foo2, ...], { your_new_code_here } )
+## mixin.createClass()
 
-`constructor` is required, and the function must be named as your new class name.
+* mixin.createClass(definition)
+* mixin.createClass(base, definition)
+* mixin.createClass([base1, base2, ...], definition)
+
+```javascript
+var definition = {
+  constructor: function Bar3() {},
+  t3: function() { return 't3'; },
+};
+```
+
+`constructor` is required, and the function `Bar3` must be named, it will be used 
+as your new class name.
 
 When a new class object constructed, the constructors of the inherited base classes 
 will be called in order.

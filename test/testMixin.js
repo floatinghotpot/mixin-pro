@@ -43,9 +43,6 @@ D.prototype = {
   }
 };
 
-// test mixin
-console.log('\ntesting mixin');
-
 var mixin = require('../mixin');
 
 D = mixin(D, A);
@@ -59,26 +56,3 @@ console.log(d.constructor.name);
 
 d.fd();
 
-// test multi inherit
-console.log('\ntesting multi inherit');
-
-var inherit = require('../mixin').inherit;
-
-var E = inherit([A, B, C], {
-  constructor: function E() {
-    this._ve = 0;
-    console.log('E');
-  },
-  fe: function() {
-    this.fa();
-    this.fb();
-    this.fc();
-    console.log('E->fe()');
-  },
-});
-
-var e = new E();
-console.log(e);
-console.log(e.constructor.name);
-
-e.fe();
