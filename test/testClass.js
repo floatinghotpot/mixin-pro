@@ -42,7 +42,7 @@ var D = Class(C, {
   },
 });
 
-var E = Class([A, B, D], {
+var E = Class([A, B, C, D], {
   constructor: function E(){
     this._fe = 0;
     console.log('E');

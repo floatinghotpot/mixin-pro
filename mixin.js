@@ -96,12 +96,12 @@ function subOf(sub, mixin) {
 function mixin(base, mixin) {
   var ctor = base;
   if (base.constructors) {
-    //if(subOf(base, mixin)) return base;
     // Don't mixin the same constructor twice.
-    for (var i in base.constructors) {
-      if (base.constructors[i] === mixin)
-        return base;
-    }
+    if(subOf(base, mixin)) return base;
+    //for (var i in base.constructors) {
+    //  if (base.constructors[i] === mixin)
+    //    return base;
+    //}
     // Remember this new one.
     base.constructors.unshift(mixin);
   } else {
