@@ -13,45 +13,58 @@ Using npm:
     npm install mixin-pro
 ```
 
-## Usage:
+## Usage
+```javascript
+var Class = require("mixin-pro").createClass;
+
+// use case 1: create a base class
+var Bar1 = Class({
+  constructor: function Bar1() {},
+  t1: function() { console.log('Bar1->t1()'); },
+});
+
+// use case 2: create a class and inherit from a base class
+var Bar2 = Class(Bar1, {
+  constructor: function Bar2() {},
+  t2: function() { console.log('Bar2->t2()'); },
+});
+
+// use case 3: create a class and inherit from multi base classes
+var Bar3 = Class([Bar1, Bar2], {
+  constructor: function Bar3() {},
+  t3: function() { console.log('Bar3->t3()'); },
+  t1: function() {
+    // call same name method in super class, with apply() or call()
+    this.Super('t1').apply(this, arguments);
+    // this.Super('t1').call(this, 1, 2, 3);
+
+    console.log('Bar3->t1()');
+  },
+});
+
+// check an object is instance of the inherited base class
+var bar3 = new Bar3();
+console.log(bar3.instanceOf(Bar3)); // true
+console.log(bar3.instanceOf(Bar1)); // true
+console.log(bar3.instanceOf(Bar2)); // true
+bar3.t1(); // Bar1->t1()   Bar3->t1()
+bar3.t2(); // Bar2->t2()
+bar3.t3(); // Bar3->t3()
+```
+
+Of course, the mixin-pro can also be used in traditional style:
+
 ```javascript
     var mixin = require("mixin-pro");
 
     // traditional: create base class Foo, Foo1, Foo2, ...
     function Foo() {}
     Foo.prototype = {
-       t0: function() { return 't0'; }
+       t0: function() { console.log('Foo->t0()'); }
     };
 
     // normal mixin: add features to existing classes
     Foo1 = mixin(Foo1, Foo2);
-
-    var Class = require("mixin-pro").createClass;
-
-    // use case 1: create a base class
-    var Bar1 = Class({
-      constructor: function Bar1() {},
-      t1: function() { return 't1'; },
-    });
-
-    // use case 2: create a class and inherit from a base class
-    var Bar2 = Class(Foo1, {
-      constructor: function Bar2() {},
-      t2: function() { return 't2'; },
-    });
-
-    // use case 3: create a class and inherit from multi base classes
-    var Bar3 = Class([Foo, Foo2, ...], {
-      constructor: function Bar3() {},
-      t3: function() { return 't3'; },
-    });
-
-    // check an object is instance of the inherited base class
-    var bar3 = new Bar3();
-    if(bar3.instanceOf(Bar3)) {} // true
-    if(bar3.instanceOf(Foo)) {} // true
-    if(bar3.instanceOf(Foo2)) {} // true
-
 ```
 
 # Usage
@@ -74,6 +87,17 @@ as your new class name.
 
 When a new class object constructed, the constructors of the inherited base classes 
 will be called in order.
+
+## obj.instanceOf(BaseClass)
+
+Check whether obj is an instance of BaseClass or derived class.
+
+## obj.Super(methodName)
+
+Get method with given name defined in base class, will return a function object, which 
+can be called with call(obj, arg1, arg2, ...) or apply(obj, arguments).
+
+Will throw error if the method is not defined in base class.
 
 ## mixin(base, mixed)
 

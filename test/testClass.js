@@ -52,6 +52,10 @@ var E = Class([A, B, D], {
     console.log('E');
   },
   ve: 'e',
+  fa: function() {
+    this.Super('fa').apply(this, arguments);
+    console.log('E->fa()');
+  },
   fe: function() {
     console.log('\naccess properties')
     console.log(this.va);
@@ -83,3 +87,7 @@ console.log('e.instanceOf(D) -> ' + e.instanceOf(D));
 console.log('e.instanceOf(E) -> ' + e.instanceOf(E));
 
 e.fe();
+
+console.log('\ncall method in base class with Super()');
+e.fa(1, 2, 3);
+

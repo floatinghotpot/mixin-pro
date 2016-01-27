@@ -48,10 +48,8 @@ function createClass() {
     throw new Error('constructor name required, it will be used as new class name');
 
   newclass.prototype = definition;
-  newclass.prototype.instanceOf = function(baseclass) {
-    if(this instanceof baseclass) return true;
-    return subOf(this.constructor, baseclass);
-  };;
+  newclass.prototype.instanceOf = instanceOf;
+  newclass.prototype.Super = superMethod;
 
   // if no mixin given, just create a base class
   if(!mixins) return newclass;
@@ -67,6 +65,28 @@ function createClass() {
     // single inheritance
     return mixin(newclass, mixins);
   }
+}
+
+// check whether this obj is an instance of base classes
+function instanceOf( baseclass ) {
+  if(this instanceof baseclass) return true;
+  return subOf(this.constructor, baseclass);
+}
+
+// find method with given name from base classes
+function superMethod(methodname) {
+  var func = null;
+  var p = this.__proto__;
+  if(!p) throw new Error('invalid parameters');
+  for(p = p.__proto__; !isEmpty(p); p = p.__proto__) {
+    var method = p[methodname];
+    if(typeof method === 'function') {
+      func = method;
+      break;
+    }
+  }
+  if(! func) throw new Error('super method not found: ' + methodname);
+  return func;
 }
 
 // check whether mixin is in inherited chain of child class
