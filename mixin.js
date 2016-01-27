@@ -42,7 +42,6 @@ function createClass() {
   var base;
   if(typeof definition['constructor'] === 'function') {
     base = definition['constructor'];
-    delete definition['constructor'];
   } else {
     base = function(){};
   }

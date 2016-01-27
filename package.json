@@ -1,7 +1,7 @@
 {
   "name": "mixin-pro",
   "description": "Javascript multi-inheritance with mixin for code reuse",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": "Raymond Xie <rjfun.mobile@gmail.com>",
   "repository": {
     "type": "git",
