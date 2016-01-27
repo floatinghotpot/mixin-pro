@@ -27,11 +27,11 @@ function createClass() {
   var mixins, definition;
   switch(arguments.length) {
     case 0:
-      throw "class definition required";
+      throw new Error('class definition required');
       break;
     case 1:
-      definition = arguments[0];
       mixins = [];
+      definition = arguments[0];
       break;
     default:
       mixins = arguments[0];
@@ -39,36 +39,48 @@ function createClass() {
       break;
   }
 
-  var base;
-  if(typeof definition['constructor'] === 'function') {
-    base = definition['constructor'];
-  } else {
-    base = function(){};
-  }
+  var newclass = definition['constructor'];
 
-  base.prototype = definition;
-  base.prototype.constructor = base;
-  base.prototype.instanceOf = function(baseclass) {
+  if(typeof newclass !== 'function')
+    throw new Error('constructor function required');
+
+  if(typeof newclass.name === 'string' && newclass.name.length === 0)
+    throw new Error('constructor name required, it will be used as new class name');
+
+  newclass.prototype = definition;
+  newclass.prototype.instanceOf = function(baseclass) {
     if(this instanceof baseclass) return true;
     return subOf(this.constructor, baseclass);
   };;
-  if(!mixins) return base;
+
+  // if no mixin given, just create a base class
+  if(!mixins) return newclass;
 
   if(Array.isArray(mixins)) {
+    // multi inheritance, if mixins is an array of base classes
     for(var i=mixins.length-1; i>=0; i--) {
-      base = mixin(base, mixins[i]);
+      newclass = mixin(newclass, mixins[i]);
     }
-    return base;
+    return newclass;
+
   } else {
-    return mixin(base, mixins);
+    // single inheritance
+    return mixin(newclass, mixins);
   }
 }
 
-function subOf(sub, mixin) {
-  if(sub === mixin) return true;
-  if(sub && sub.constructors) {
-    for(var i in sub.constructors) {
-      if((sub.constructors[i] !== sub) && subOf(sub.constructors[i], mixin)) return true;
+// check whether mixin is in inherited chain of child class
+function subOf(child, mixin) {
+  if(child === mixin) return true;
+  if(child && child.constructors) {
+    for(var i in child.constructors) {
+      var parent = child.constructors[i];
+
+      // avoid dead loop
+      if(parent === child) continue;
+
+      if(parent === mixin) return true;
+      if(subOf(parent, mixin)) return true;
     }
   }
   return false;
@@ -95,18 +107,15 @@ function subOf(sub, mixin) {
 function mixin(base, mixin) {
   var ctor = base;
   if (base.constructors) {
-    // Don't mixin the same constructor twice.
+    // Don't mixin the same constructor if already mixed.
     if(subOf(base, mixin)) return base;
-    //for (var i in base.constructors) {
-    //  if (base.constructors[i] === mixin)
-    //    return base;
-    //}
     // Remember this new one.
     base.constructors.unshift(mixin);
+
   } else {
     // Remember all mixed in classes
     base.constructors = [mixin, base];
-    // Create a function with the same name, that calls both functions...
+    // Create a function with the same name, that calls all inherited constructors ...
     ctor = base.prototype.constructor = mixin_constructor(base.name, base);
     ctor.__proto__ = base;
   }
